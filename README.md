@@ -72,12 +72,12 @@ Create a simple front-end application based on the provided figma mock ups.
 ## Outline
 Your application should render a very basic list of users, and a detail pane showing user information. A user should be able to modify existing users, and create new users.
 
-![User Details Page](https://github.com/user-attachments/assets/e2cbe7fe-e248-4a17-b3bb-7eae24c271fa)
+![User Details Page](public/394021448-e2cbe7fe-e248-4a17-b3bb-7eae24c271fa.png)
 
 ## User List
 The user list should show a filterable collection of user list objects.
 
-![image](https://github.com/user-attachments/assets/17ecc77a-0309-4090-a827-ae11b8a4488c)
+![image](public/394035220-17ecc77a-0309-4090-a827-ae11b8a4488c.png)
 
 ### Users should be able to:
 - Click an item in the list and see user details in the detail pane
@@ -87,7 +87,7 @@ The user list should show a filterable collection of user list objects.
 ## Details Pane
 The details pane shows the detail of an individual user.
 
-![image](https://github.com/user-attachments/assets/eccd5366-396d-4856-9c78-659e9eff7177)
+![image](public/394015956-eccd5366-396d-4856-9c78-659e9eff7177.png)
 
 ### Users should be able to:
 - View basic details about the current user
@@ -98,7 +98,7 @@ The details pane shows the detail of an individual user.
 ## Filter Panel
 The filter panel is used for filtering the user list.
 
-![image](https://github.com/user-attachments/assets/e8fef909-ff17-4b8d-bf7f-a2ad241fa322)
+![image](public/394034274-e8fef909-ff17-4b8d-bf7f-a2ad241fa322.png)
 
 ### Users should be able to:
 - Select from a list of Plan Types
@@ -108,7 +108,7 @@ The filter panel is used for filtering the user list.
 
 ## Create User Modal
 The create user modal is used for creating a new user and should include form validation.
-![image](https://github.com/user-attachments/assets/6cf698ac-581a-4920-8515-02e627c5ccbb)
+![image](public/394021283-6cf698ac-581a-4920-8515-02e627c5ccbb.png)
 
 ### Users should be able to:
 - See a modal dialog containing fields for creating a new user (Profile picture is optional)
