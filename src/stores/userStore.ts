@@ -1,0 +1,84 @@
+import { BasicFormData } from '@/types/Form';
+import User from '../types/User';
+import {defineStore} from 'pinia';
+import {ref, computed} from 'vue';
+
+export const useUserStore = defineStore('user', () => {
+
+   const users= ref<User[] >([]);
+
+   const user = ref<User | null>(null);
+
+   const initializeUser = () => {
+        user.value = {
+            id: 0,
+            plan: '',
+            email: '',
+            company: '',
+            first_name: '',
+            last_name: '',
+            phone_number: ''
+        };
+        return user.value;
+   }
+
+   const fetchUsers= async () => {
+        try{
+            const response = await fetch('https://retoolapi.dev/0PIjUI/users',
+            );
+            users.value = await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchUserById = async (id: string) => {
+        try{
+            const response = await fetch(`https://retoolapi.dev/0PIjUI/users/${id}`);
+            user.value= await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+   }
+
+   const updateUser = async (id: number, updatedUser: BasicFormData) => {
+    try{
+        const response = await fetch(`https://retoolapi.dev/0PIjUI/users/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedUser)
+        });
+        const updatedUserData = await response.json();
+        const index = users.value.findIndex(user => user.id === id);
+        if (index !== -1) {
+            users.value[index] = updatedUserData;
+        }
+        return updatedUserData;
+
+    } catch (error) {
+        console.error(error);
+    }
+   }
+
+   const createNewUser = async (newUser: BasicFormData) => {
+    try{
+        const response = await fetch('https://retoolapi.dev/0PIjUI/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newUser)
+        });
+        const createdUserData = await response.json();
+        users.value.push(createdUserData);
+        return createdUserData;
+    } catch (error) {
+        console.error(error);
+    }
+   }
+    const userCount = computed(() => users.value.length);
+    return {users, user, initializeUser, fetchUsers, fetchUserById,  updateUser, createNewUser, userCount}
+    
+});
