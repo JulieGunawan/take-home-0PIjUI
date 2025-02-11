@@ -1,10 +1,12 @@
-<script setup>
+<script setup lang="ts">
+import HomePage from '@/pages/HomePage.vue';
+
 
 </script>
 
 <template>
   <main>
-    ...entrypoint
+    <HomePage />
   </main>
 </template>
 
