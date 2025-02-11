@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { storeToRefs } from 'pinia';
 import { BasicFormData, FormErrors } from '@/types/Form';
+import {  BookmarkSquareIcon } from '@heroicons/vue/24/outline';
 
 const userStore = useUserStore();
-
 const {user} = storeToRefs(userStore);
 const loading = ref<boolean>(true);
 const isCreate = ref<boolean>(false);
@@ -58,7 +58,7 @@ const validateForm = () => {
     ? 'Invalid email format'
     : '';
 
-  // Phone validation (simple format: XXX-XXX-XXXX or 10 digits)
+  // Phone validation (simple format: (XXX) XXX-XXXX)
   const phoneRegex = /^\(\d{3}\)\s\d{3}-\d{4}$/;
   errors.phone_number = !formData.phone_number 
     ? 'Phone is required' 
@@ -67,10 +67,9 @@ const validateForm = () => {
     : '';
 };
   
-const handleSubmit = () => {
+const handleSubmit = async () => {
   validateForm();
   
-  // Check if there are any errors
   if (Object.values(errors).every(error => !error)) {
     // Check if any user was selected or user value was initialized
     if (user.value) { 
@@ -78,7 +77,9 @@ const handleSubmit = () => {
             userStore.updateUser(user.value.id, formData);
         } 
         else { 
-            userStore.createNewUser(formData);
+            //capture the created User then update the state with created user
+            const createdUser = await userStore.createNewUser(formData);
+            await userStore.fetchUserById(createdUser.id.toString());
         }
     } else {
         console.log("Please enter some data");  
@@ -88,27 +89,31 @@ const handleSubmit = () => {
   }
 };
 </script>
+
 <template>
-  <div class="w-4/5 h-screen bg-gray-300 flex flex-col p-4">
+  <div class="w-3/4 h-screen bg-gray-300 flex flex-col p-4">
     <div class="bg-white flex flex-col">
         <form  class="flex flex-col gap-3" >
-            <div class="bg-white flex flex-col md:flex-row h-[80%] overflow-hidden p-4 rounded items-center md:items-start">
-                <div class="w-1/2 md:w-1/4 md:h-full bg-blue-200 overflow-y-auto">
+            <div class="bg-white flex flex-col md:flex-row h-[80%] overflow-hidden p-4 rounded items-center md:items-start text-sm md:text-base xl:text-lg">
+                <div class="w-full md:w-1/4 md:h-full bg-blue-200 overflow-y-auto" v-if="!isCreate">
                     <img
                     src="https://api.dicebear.com/9.x/adventurer/svg?seed=Jude"
                     alt="avatar"
-                    class="object-fit-cover" 
+                    class="object-fit w-1/2 md:w-full mx-auto md:mx-0" 
                     />
                 </div>
                 <div class="w-full md:w-3/4 bg-blue-50 overflow-y-auto ">
-                    <div class="flex flex-col gap-2 p-6">                     
-                        <h2 class="text-sm md:text-base text-black font-bold  py-1 px-4 align-left w-full">
+                    <div class="flex flex-col gap-1 md:gap-2 p-4 lg:p-6">                     
+                        <h2 class=" text-black font-bold  py-1 px-4 align-left w-full" v-if="!isCreate">
                             {{ formData.first_name }} {{ formData.last_name.charAt(0) }}
                         </h2>
-                        <h3 class="text-gray-500 text-sm md:text-base font-normal py-1 px-4 align-left w-full">
-                            Product Manager
+                        <h2 class=" text-black font-bold  py-1 px-4 align-left w-full" v-if="isCreate">
+                            Creating New User
+                        </h2>
+                        <h3 class="text-gray-500 font-normal py-1 px-4 align-left w-full" >
+                            {{ isCreate ? "- ": "Product Manager"  }}
                         </h3>
-                        <h4 class="text-black text-sm md:text-base font-normal py-2 px-4 align-left w-full">
+                        <h4 class="text-black font-normal py-2 px-4 align-left w-full">
                             User Details
                         </h4>
                         <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
@@ -152,9 +157,7 @@ const handleSubmit = () => {
                                 <option value="Axiomworx">Axiomworx</option>
                                 <option value="Equinox Engineering">Equinox Engineering</option>
                                 <option value="Apple">Apple</option>
-                            </select>
-                            
-                          
+                            </select> 
                         </div>
                         <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
                             <label class="px-2 whitespace-nowrap">
@@ -179,18 +182,16 @@ const handleSubmit = () => {
                 </div>
             </div>
             <hr />
-            <div class="h-[20%] bg-white">
-             
-                    <div class="flex justify-end px-7 py-4">
+            <div class="h-[20%] bg-white ">
+                <div class="flex justify-end px-7 py-4 w-full">
                     <button type="button"
                     @click="handleSubmit" 
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-light py-2 px-4 rounded"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-light text-sm md:text-base xl:text-lg py-2 px-4 rounded flex flex-row gap-2 items-center justify-center w-1/3 xl:w-1/2"
                     >
+                        <BookmarkSquareIcon v-if="!isCreate" class="h-4 w-4 text-white" />
                         {{isCreate ? 'Create' : 'Save'}} 
                     </button>
                 </div> 
-            
-                
             </div>
         </form>
     </div>

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { FunnelIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useUserStore } from '../stores/userStore';
-import { onMounted } from 'vue';
-import { defineStore, storeToRefs } from 'pinia';
+import { onMounted, ref } from 'vue';
+import {  storeToRefs } from 'pinia';
+import { FilterProps } from '@/types/Filter';
 
 const userStore = useUserStore();
-const {users, user} = storeToRefs(userStore);
+const {users} = storeToRefs(userStore);
 
 onMounted(() => {
     userStore.fetchUsers();
@@ -18,35 +19,94 @@ const selectUser = (id: string) => {
 const handleCreateNewUser = () => {
     userStore.initializeUser();
 }
+
+const activateFilter = ref<boolean>(false);
+
+const filters = ref<FilterProps>({
+    firstName: '',
+    lastName: '',
+    plan: 'All Plans'
+});
+
+const handleReset= () => {
+    filters.value = {
+        firstName: '',
+        lastName: '',
+        plan: 'All Plans'
+    }
+    userStore.fetchUsers();
+    activateFilter.value = false;
+}
+
+const handleFilter = () => {
+    userStore.fetchUsersByFilter(filters.value);
+}
 </script>
 
 <template>
-  <div class="w-1/5 h-screen flex flex-col">
-    <div class="gap-1 flex flex-col items-center justify-center md:gap-2">
-        <button class="text-sm md:text-base bg-blue-500 hover:bg-green-700 text-white font-light py-1 px-2 md:py-2 md:px-4 rounded flex items-center gap-1 md:gap-2 w-full ">
+  <div class="w-1/4 h-screen flex flex-col ">
+    <div class="gap-1 flex flex-col md:gap-2 p-4">
+        <button class="text-sm md:text-base xl:text-lg bg-blue-500 hover:bg-blue-700 text-white font-light  py-1 px-2 md:py-2 md:px-4 rounded flex items-center gap-1 md:gap-2 w-full"
+        @click="activateFilter = !activateFilter"
+        >
             <FunnelIcon class="h-3 w-3 md:h-5 md:w-5 text-white " />
             Filter Users
         </button>
-        
+        <div  v-if="activateFilter" >
+            <div class="flex flex-col gap-2 p-2 md:p-4 xl:p-6 w-[80%]">   
+                    <div class="bg-gray-200 flex flex-col md:flex-row w-full p-2 md:p-3 xl:p-4 rounded gap-2">
+                        <label class="px-2 text-sm md:text-base xl:text-lg" placeholder="First Name">    
+                            First Name
+                        </label>
+                        <input type="text" class="w-full px-2 text-sm md:text-base xl:text-lg" v-model="filters.firstName" placeholder="First Name" >
+                    </div>
+                    <div class="bg-gray-200 flex flex-col md:flex-row w-full p-2 md:p-3 xl:p-4  rounded gap-2">
+                        <label class="px-2 text-sm md:text-base xl:text-lg" > 
+                            Last Name:
+                        </label>
+                        <input type="text" class="w-full px-2"  v-model="filters.lastName" placeholder="Last Name">
+                    </div>
+                    <div class="bg-gray-200 flex flex-col md:flex-row w-full p-2 md:p-3 xl:p-4  rounded gap-2">
+                        <label class="px-2 text-sm md:text-base xl:text-lg" >
+                            Plan: 
+                        </label>
+                        <select class="w-full px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm md:text-base xl:text-lg"  
+                        v-model="filters.plan"
+                        >
+                            <option value="All Plans">All Plans</option>
+                            <option value="Free Plan">Free</option>
+                            <option value="Pro Plan">Pro</option>
+                            <option value="Trial">Trial</option>
+                        </select>
+                    </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between p-2 lg:p-4 xl:p-6">
+                <button @click="handleReset" class="text-gray-400">Reset</button>  
+                <button @click="handleFilter" class="bg-blue-500 hover:bg-blue-700 text-white font-light py-2 px-4 rounded">Filter</button>  
+            </div>
+        </div> 
     </div>
-    
-        <ul class="bg-white flex flex-col w-full items-center overflow-y-auto flex-grow justify-center">
+
+    <div class="flex-grow overflow-hidden overflow-y-auto flex flex-col ">
+        <ul class="bg-white flex flex-col w-full items-center">
             <li v-for="user in users" 
-            :key="user.id" class="text-sm md:text-base bg-white hover:bg-blue-50 hover:rounded-full text-black hover:text-blue-600 font-normal py-2  w-4/5 cursor-pointer"
+            :key="user.id" 
+            class="text-sm md:text-base xl:text-lg bg-white hover:bg-blue-50 hover:rounded-full text-black hover:text-blue-600 font-normal py-2  w-4/5 cursor-pointer"
             @click="selectUser(user.id.toString())"
             >
                 {{ user.first_name }} {{ user.last_name .charAt(0) }}
             </li>
         </ul>
+    </div>
     
 
     <div class="bg-gray-200 flex items-center justify-center h-60 w-full">
         <button 
             type="button"
-            class="text-sm md:text-base bg-blue-500 hover:bg-green-700 text-white font-light py-1 px-2 rounded flex  items-center gap-2"
+            class="text-sm md:text-base xl:text-lg bg-blue-500 hover:bg-blue-700 text-white font-light py-1 px-2 rounded flex items-center gap-2"
             @click="handleCreateNewUser()"
         >
-            <PlusIcon class="h-4 w-4 text-white" />
+            <PlusIcon class="h-3 w-3 md:h-5 md:w-5 text-white" />
             Create New User
         </button>
     </div>

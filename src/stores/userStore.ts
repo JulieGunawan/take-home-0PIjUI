@@ -2,6 +2,7 @@ import { BasicFormData } from '@/types/Form';
 import User from '../types/User';
 import {defineStore} from 'pinia';
 import {ref, computed} from 'vue';
+import { FilterProps } from '@/types/Filter';
 
 export const useUserStore = defineStore('user', () => {
 
@@ -39,6 +40,29 @@ export const useUserStore = defineStore('user', () => {
         } catch (error) {
             console.error(error);
         }
+   }
+
+   const fetchUsersByFilter = async (filter: FilterProps) => {
+    console.log("filter", filter);
+    const queryParams = new URLSearchParams();
+    console.log("init queryParams", queryParams);
+    if (filter.firstName) {
+        queryParams.append('first_name', filter.firstName);
+    }
+    if (filter.lastName) {
+        queryParams.append('last_name', filter.lastName);
+    }
+    if (filter.plan && filter.plan !== 'All Plans') {
+        queryParams.append('plan', filter.plan);
+    }
+
+    console.log("query params", queryParams.toString());
+    try{
+        const response = await fetch(`https://retoolapi.dev/0PIjUI/users?${queryParams.toString()}`);
+        users.value = await response.json();
+    } catch (error) {
+        console.error(error);
+    }
    }
 
    const updateUser = async (id: number, updatedUser: BasicFormData) => {
@@ -79,6 +103,6 @@ export const useUserStore = defineStore('user', () => {
     }
    }
     const userCount = computed(() => users.value.length);
-    return {users, user, initializeUser, fetchUsers, fetchUserById,  updateUser, createNewUser, userCount}
+    return {users, user, initializeUser, fetchUsers, fetchUserById, fetchUsersByFilter, updateUser, createNewUser, userCount}
     
 });
