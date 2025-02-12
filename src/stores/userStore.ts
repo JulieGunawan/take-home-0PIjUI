@@ -43,9 +43,8 @@ export const useUserStore = defineStore('user', () => {
    }
 
    const fetchUsersByFilter = async (filter: FilterProps) => {
-    console.log("filter", filter);
     const queryParams = new URLSearchParams();
-    console.log("init queryParams", queryParams);
+
     if (filter.firstName) {
         queryParams.append('first_name', filter.firstName);
     }
@@ -56,7 +55,6 @@ export const useUserStore = defineStore('user', () => {
         queryParams.append('plan', filter.plan);
     }
 
-    console.log("query params", queryParams.toString());
     try{
         const response = await fetch(`https://retoolapi.dev/0PIjUI/users?${queryParams.toString()}`);
         users.value = await response.json();
