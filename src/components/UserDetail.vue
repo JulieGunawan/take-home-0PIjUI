@@ -100,7 +100,7 @@ const handleSubmit = async () => {
             class="w-full md:w-1/4 md:h-full bg-blue-200 overflow-y-auto"
           >
             <img
-              src="https://api.dicebear.com/9.x/adventurer/svg?seed=Jude"
+              :src="`https://api.dicebear.com/9.x/adventurer/svg?seed=${ formData.first_name }`"
               alt="avatar"
               class="object-fit w-1/2 md:w-full mx-auto md:mx-0" 
             >
