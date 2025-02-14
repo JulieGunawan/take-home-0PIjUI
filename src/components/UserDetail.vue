@@ -20,6 +20,65 @@ const formData = reactive<BasicFormData>({
     phone_number: ''
 })
 
+// Format inputted phone number
+const formatPhoneNumber = (phone: string): string => {
+  // Strip all non-numeric characters
+  const cleaned = phone.replace(/\D/g, '');
+  
+  // Get the first 10 digits, eventhough the limit was implemented in the form
+  const numbers = cleaned.substring(0, 10);
+  
+  // If empty, return empty string
+  if (!numbers) return '';
+  
+  // Format according to length, to be (XXX) XXX-XXXX
+  if (numbers.length < 4) return numbers;
+  if (numbers.length < 7) {
+    return `(${numbers.substring(0, 3)}) ${numbers.substring(3)}`;
+  }
+  return `(${numbers.substring(0, 3)}) ${numbers.substring(3, 6)}-${numbers.substring(6, 10)}`;
+};
+
+// Computed property for formatted display
+const formattedPhone = computed(() => {
+  return formatPhoneNumber(formData.phone_number);
+});
+
+// Handle input changes
+const handlePhoneInput = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const cleaned = input.value.replace(/\D/g, '').substring(0, 10);
+  formData.phone_number = cleaned;
+};
+
+const validateForm = () => {
+  errors.first_name = !formData.first_name ? 'First name is required' : '';
+  errors.last_name = !formData.last_name ? 'Last name is required' : '';
+  errors.plan = !formData.plan ? 'Plan is required' : '';
+  errors.company = !formData.company ? 'Company is required' : '';
+  
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  errors.email = !formData.email 
+    ? 'Email is required' 
+    : !emailRegex.test(formData.email) 
+    ? 'Invalid email format'
+    : '';
+  
+  // Phone number validation
+  const formattedPhoneNumber = formData.phone_number.replace(/\D/g, '');
+  errors.phone_number = !formData.phone_number 
+    ? 'Phone is required' 
+    : formattedPhoneNumber.length < 10 
+    ? 'Phone number must be 10 digits'
+    : '';
+};
+  
+const isFormValid = computed(() => {
+  return Object.values(errors).every((error) => !error);
+});
+
+//watch the selected user from the left hand side list
 watch(() => user.value, (selectedUser) => {
     if (selectedUser && selectedUser.id!==0) {
         formData.first_name = selectedUser.first_name;
@@ -31,57 +90,22 @@ watch(() => user.value, (selectedUser) => {
         loading.value = false;
         isCreate.value = false;
     } else {
-        formData.first_name = '';
-        formData.last_name = '';
-        formData.company = '';
-        formData.email = '';
-        formData.plan = '';
-        formData.phone_number = '';
+      formData.first_name = "";
+        formData.last_name = "";
+        formData.company = "";
+        formData.email = "";
+        formData.plan = "";
+        formData.phone_number = "";
         loading.value = false;
         isCreate.value = true;
     }
+    // validateForm();
 }, {immediate: true});
 
-const validateForm = () => {
-  errors.first_name = !formData.first_name ? 'First name is required' : '';
-  errors.last_name = !formData.last_name ? 'Last name is required' : '';
-  errors.plan = !formData.plan ? 'Plan is required' : '';
-  errors.company = !formData.company ? 'Company is required' : '';
-  errors.email = !formData.email ? 'Email is required' : '';
-  errors.phone_number = !formData.phone_number ? 'Phone is required' : '';
-  
-  // Email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  errors.email = !formData.email 
-    ? 'Email is required' 
-    : !emailRegex.test(formData.email) 
-    ? 'Invalid email format'
-    : '';
-
-  // Phone validation (simple format: (XXX) XXX-XXXX)
-  const phoneRegex = /^\(\d{3}\)\s\d{3}-\d{4}$/;
-  errors.phone_number = !formData.phone_number 
-    ? 'Phone is required' 
-    : !phoneRegex.test(formData.phone_number) 
-    ? 'Invalid phone format (XXX) XXX-XXXX'
-    : '';
-};
-  
-const isFormValid = computed(() => {
-  const requiredFields = [
-    formData.first_name,
-    formData.last_name,
-    formData.company,
-    formData.email,
-    formData.plan,
-    formData.phone_number
-  ];
-  
-  const allFieldsFilled = requiredFields.every(field => field && field.trim() !== '');
-  
-  const noErrors = Object.values(errors).every(error => !error);
-  return allFieldsFilled && noErrors;
-})
+// Watch for changes in form data
+watch(formData, () => {
+  validateForm();
+}, { deep: true });
 
 const handleSubmit = async () => {
   validateForm();
@@ -285,10 +309,12 @@ const handleSubmit = async () => {
                     >*</span>
                     Phone:
                   </label>
-                  <input
-                    v-model="formData.phone_number"
+                  <input  
+                    :value="formattedPhone"
+                    @input="handlePhoneInput"
                     type="text"
                     class="w-full px-2"
+                    maxLength="14"
                   >
                 </div>
                 <div
