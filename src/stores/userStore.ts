@@ -56,12 +56,23 @@ export const useUserStore = defineStore('user', () => {
       queryParams.append('plan', filter.plan)
     }
 
-    try {
-      const response = await fetch(`https://retoolapi.dev/0PIjUI/users?${queryParams.toString()}`)
-      users.value = await response.json()
-    }
-    catch (error) {
-      console.error(error)
+    try{
+        const allResponse = await fetch('https://retoolapi.dev/0PIjUI/users');
+        let allUsers:User[] = await allResponse.json();
+
+        if(filter.firstName){
+            allUsers = allUsers.filter((user)=> user.first_name.toLowerCase().includes(filter.firstName.toLowerCase()));
+        }
+        if(filter.lastName){
+            allUsers = allUsers.filter((user)=> user.last_name.toLowerCase().includes(filter.lastName.toLowerCase()));
+        }
+        if(filter.plan && filter.plan !== 'All Plans'){
+            allUsers = allUsers.filter((user)=> user.plan.toLowerCase().includes(filter.plan.toLowerCase()));
+        }
+        
+        users.value=allUsers;
+    } catch (error) {
+        console.error(error);
     }
   }
 

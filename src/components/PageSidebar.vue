@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { FunnelIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { useUserStore } from '../stores/userStore';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import {  storeToRefs } from 'pinia';
 import { FilterProps } from '@/types/Filter';
+import debounce from 'lodash/debounce';
 
 const userStore = useUserStore();
 const {users} = storeToRefs(userStore);
@@ -38,9 +39,19 @@ const handleReset= () => {
     activateFilter.value = false;
 }
 
-const handleFilter = () => {
-    userStore.fetchUsersByFilter(filters.value);
-}
+
+const debounceFilter = debounce((filterInput: FilterProps) => {
+    userStore.fetchUsersByFilter(filterInput);  
+},300);
+
+watch(
+    () => filters.value,
+    (newFilters) => {
+        debounceFilter(newFilters);
+    },
+    { deep: true }
+)
+
 </script>
 
 <template>
@@ -53,36 +64,35 @@ const handleFilter = () => {
             Filter Users
         </button>
         <div  v-if="activateFilter" >
-            <div class="flex flex-col gap-2 p-2 md:p-4 xl:p-6 w-[80%]">   
-                    <div class="bg-gray-200 flex flex-col md:flex-row w-full p-2 md:p-3 xl:p-4 rounded gap-2">
-                        <label class="px-2 text-sm md:text-base xl:text-lg" placeholder="First Name">    
-                            First Name
-                        </label>
-                        <input type="text" class="w-full px-2 text-sm md:text-base xl:text-lg" v-model="filters.firstName" placeholder="First Name" >
-                    </div>
-                    <div class="bg-gray-200 flex flex-col md:flex-row w-full p-2 md:p-3 xl:p-4  rounded gap-2">
-                        <label class="px-2 text-sm md:text-base xl:text-lg" > 
-                            Last Name:
-                        </label>
-                        <input type="text" class="w-full px-2"  v-model="filters.lastName" placeholder="Last Name">
-                    </div>
-                    <div class="bg-gray-200 flex flex-col md:flex-row w-full p-2 md:p-3 xl:p-4  rounded gap-2">
-                        <label class="px-2 text-sm md:text-base xl:text-lg" >
-                            Plan: 
-                        </label>
-                        <select class="w-full px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm md:text-base xl:text-lg"  
-                        v-model="filters.plan"
-                        >
-                            <option value="All Plans">All Plans</option>
-                            <option value="Free Plan">Free</option>
-                            <option value="Pro Plan">Pro</option>
-                            <option value="Trial">Trial</option>
-                        </select>
-                    </div>
+            <div class="flex flex-col gap-2 p-2 w-[80%]">   
+                <div class="bg-gray-200 flex flex-col w-full p-2 md:p-3 xl:p-4 rounded gap-2">
+                    <label class="text-sm xl:text-base" placeholder="First Name">    
+                        First Name:
+                    </label>
+                    <input type="text" class="p-2 text-sm xl:text-base rounded-md" v-model="filters.firstName" placeholder="First Name" >
+                </div>
+                <div class="bg-gray-200 flex flex-col w-full p-2 md:p-3 xl:p-4  rounded gap-2">
+                    <label class="text-sm xl:text-base" > 
+                        Last Name:
+                    </label>
+                    <input type="text" class="p-2 text-sm xl:text-base rounded-md"  v-model="filters.lastName" placeholder="Last Name">
+                </div>
+                <div class="bg-gray-200 flex flex-col w-full p-2 md:p-3 xl:p-4 gap-2">
+                    <label class=" text-sm xl:text-base" >
+                        Plan: 
+                    </label>
+                    <select class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm xl:text-base"  
+                    v-model="filters.plan"
+                    >
+                        <option value="All Plans">All Plans</option>
+                        <option value="Free Plan">Free</option>
+                        <option value="Pro Plan">Pro</option>
+                        <option value="Trial">Trial</option>
+                    </select>
+                </div>
             </div>
-            <div class="flex flex-col md:flex-row justify-between p-2 lg:p-4 xl:p-6">
+            <div class="flex flex-col md:flex-row justify-between p-2">
                 <button @click="handleReset" class="text-gray-400">Reset</button>  
-                <button @click="handleFilter" class="bg-blue-500 hover:bg-blue-700 text-white font-light py-2 px-4 rounded">Filter</button>  
             </div>
         </div> 
     </div>
