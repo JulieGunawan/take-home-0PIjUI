@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, computed } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { storeToRefs } from 'pinia';
 import { BasicFormData, FormErrors } from '@/types/Form';
@@ -67,9 +67,26 @@ const validateForm = () => {
     : '';
 };
   
+const isFormValid = computed(() => {
+  const requiredFields = [
+    formData.first_name,
+    formData.last_name,
+    formData.company,
+    formData.email,
+    formData.plan,
+    formData.phone_number
+  ];
+  
+  const allFieldsFilled = requiredFields.every(field => field && field.trim() !== '');
+  
+  const noErrors = Object.values(errors).every(error => !error);
+  return allFieldsFilled && noErrors;
+})
+
 const handleSubmit = async () => {
   validateForm();
   
+  // Check if the form doesn't have any errors
   if (Object.values(errors).every(error => !error)) {
     // Check if any user was selected or user value was initialized
     if (user.value) { 
@@ -81,12 +98,8 @@ const handleSubmit = async () => {
             const createdUser = await userStore.createNewUser(formData);
             await userStore.fetchUserById(createdUser.id.toString());
         }
-    } else {
-        console.log("Please enter some data");  
-    }
-  } else {
-    console.log('Form has errors', errors);
-  }
+    } 
+  } 
 };
 </script>
 
@@ -125,110 +138,147 @@ const handleSubmit = async () => {
               <h4 class="text-black font-normal py-2 px-4 align-left w-full">
                 User Details
               </h4>
-              <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
-                <label
-                  class="px-2 whitespace-nowrap"
-                  placeholder="First Name"
+              <div class="flex flex-col gap-1 bg-gray-200 pt-7 pb-2 px-2">
+                <div class="flex flex-col md:flex-row w-full rounded gap-2">
+                  <label
+                    class="pr-2 md:px-2 whitespace-nowrap"
+                    placeholder="First Name"
+                  >
+                    <span
+                      v-if="errors.first_name"
+                      class="text-red-500"
+                    >*</span>
+                    First Name:
+                  </label>
+                  <input
+                    v-model="formData.first_name"
+                    type="text"
+                    class="w-full px-2"
+                  >
+                </div>
+                <div
+                  class="text-sm text-red-500 pl-2 "
                 >
-                  <span
-                    v-if="errors.first_name"
-                    class="text-red-500"
-                  >*</span>
-                  First Name:
-                </label>
-                <input
-                  v-model="formData.first_name"
-                  type="text"
-                  class="w-full px-2"
-                >
+                  {{ errors.first_name ? errors.first_name : '\u00A0' }} 
+                </div>
               </div>
-              <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
-                <label
-                  class="px-2 whitespace-nowrap"
-                  placeholder="Last Name"
-                > 
-                  <span
-                    v-if="errors.last_name"
-                    class="text-red-500"
-                  >*</span> 
-                  Last Name:
-                </label>
-                <input
-                  v-model="formData.last_name"
-                  type="text"
-                  class="w-full px-2"
+              <div class="flex flex-col gap-1 bg-gray-200 pt-7 pb-2 px-2">
+                <div class="flex flex-col md:flex-row w-full rounded gap-2">
+                  <label
+                    class="pr-2 md:px-2 whitespace-nowrap"
+                    placeholder="Last Name"
+                  > 
+                    <span
+                      v-if="errors.last_name"
+                      class="text-red-500"
+                    >*</span> 
+                    Last Name:
+                  </label>
+                  <input
+                    v-model="formData.last_name"
+                    type="text"
+                    class="w-full px-2"
+                  >
+                </div>
+                <div
+                  class="text-sm text-red-500 pl-2 "
                 >
+                  {{ errors.last_name ? errors.last_name : '\u00A0' }} 
+                </div>
               </div>
-              <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
-                <label class="px-2 whitespace-nowrap">
-                  <span
-                    v-if="errors.plan"
-                    class="text-red-500"
-                  >*</span>
-                  Plan: 
-                </label>
-                <select
-                  v-model="formData.plan" 
-                  class="w-full px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" 
-                  placeholder="Select Plan"
+              <div class="flex flex-col gap-1 bg-gray-200 pt-7 pb-2 px-2">
+                <div class=" flex flex-col md:flex-row w-full rounded gap-2">
+                  <label class="pr-2 md:px-2 whitespace-nowrap">
+                    <span
+                      v-if="errors.plan"
+                      class="text-red-500"
+                    >*</span>
+                    Plan: 
+                  </label>
+                  <select
+                    v-model="formData.plan" 
+                    class="w-full px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" 
+                    placeholder="Select Plan"
+                  >
+                    <!-- Due to the data available, these options  are missing some values  -->
+                    <option value="Free Plan">
+                      Free
+                    </option>
+                    <option value="Pro Plan">
+                      Pro
+                    </option>
+                    <option value="Trial">
+                      Trial
+                    </option>
+                  </select>
+                </div>
+                <div
+                  class="text-sm text-red-500 pl-2 "
                 >
-                  <!-- Due to the data available, these options  are missing some values  -->
-                  <option value="Free Plan">
-                    Free
-                  </option>
-                  <option value="Pro Plan">
-                    Pro
-                  </option>
-                  <option value="Trial">
-                    Trial
-                  </option>
-                </select>
+                  {{ errors.plan ? errors.plan : '\u00A0' }} 
+                </div>
               </div>
-              <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
-                <label
-                  class="px-2 whitespace-nowrap"
-                  placeholder="Company Name"
-                > 
-                  <span
-                    v-if="errors.company"
-                    class="text-red-500"
-                  >*</span> 
-                  Company:
-                </label>
-                <!-- Due to the data available, these options don't seem to be applied  -->
-                <select
-                  v-model="formData.company" 
-                  class="w-full px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  placeholder="Select Company"
+              <div class="flex flex-col gap-1 bg-gray-200 pt-7 pb-2 px-2">
+                <div class="flex flex-col md:flex-row w-full rounded gap-2">
+                  <label
+                    class="pr-2 md:px-2 whitespace-nowrap"
+                    placeholder="Company Name"
+                  > 
+                    <span
+                      v-if="errors.company"
+                      class="text-red-500"
+                    >*</span> 
+                    Company:
+                  </label>
+                  <!-- Due to the data available, these options don't seem to be applied  -->
+                  <select
+                    v-model="formData.company" 
+                    class="w-full px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    placeholder="Select Company"
+                  >
+                    <option value="Axiomworx">
+                      Axiomworx
+                    </option>
+                    <option value="Equinox Engineering">
+                      Equinox Engineering
+                    </option>
+                    <option value="Apple">
+                      Apple
+                    </option>
+                  </select> 
+                </div>
+                <div
+                  class="text-sm text-red-500 pl-2 "
                 >
-                  <option value="Axiomworx">
-                    Axiomworx
-                  </option>
-                  <option value="Equinox Engineering">
-                    Equinox Engineering
-                  </option>
-                  <option value="Apple">
-                    Apple
-                  </option>
-                </select> 
+                  {{ errors.company ? errors.company : '\u00A0' }} 
+                </div>
               </div>
-              <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
-                <label class="px-2 whitespace-nowrap">
-                  <span
-                    v-if="errors.email"
-                    class="text-red-500"
-                  >*</span>
-                  Email:
-                </label>
-                <input
-                  v-model="formData.email"
-                  type="text"
-                  class="w-full px-2"
+            
+              <div class="flex flex-col gap-1 bg-gray-200 pt-7 pb-2 px-2">
+                <div class="flex flex-col md:flex-row w-full rounded gap-2">
+                  <label class="pr-2 md:px-2 whitespace-nowrap">
+                    <span
+                      v-if="errors.email"
+                      class="text-red-500"
+                    >*</span>
+                    Email:
+                  </label>
+                  <input
+                    v-model="formData.email"
+                    type="text"
+                    class="w-full px-2"
+                  >
+                </div>
+                <div
+                  class="text-sm text-red-500 pl-2 "
                 >
+                  {{ errors.email ? errors.email : '\u00A0' }} 
+                </div>
               </div>
-              <div class="flex flex-col gap-1">
-                <div class="bg-gray-200 flex flex-col md:flex-row w-full p-3 lg:p-5 rounded gap-2">
-                  <label class="px-2 whitespace-nowrap">
+              
+              <div class="flex flex-col gap-1 bg-gray-200 pt-7 pb-2 px-2">
+                <div class="flex flex-col md:flex-row w-full rounded gap-2">
+                  <label class="pr-2 md:px-2 whitespace-nowrap">
                     <span
                       v-if="errors.phone_number"
                       class="text-red-500"
@@ -242,10 +292,9 @@ const handleSubmit = async () => {
                   >
                 </div>
                 <div
-                  v-if="errors.phone_number"
-                  class="pl-7 text-sm text-red-500"
+                  class="pl-7 text-sm text-red-500 block min-h-20"
                 >
-                  {{ errors.phone_number }}
+                  {{ errors.phone_number ? errors.phone_number : '\u00A0' }}
                 </div>
               </div>
             </div>
@@ -257,6 +306,8 @@ const handleSubmit = async () => {
             <button
               type="button"
               class="bg-blue-500 hover:bg-blue-700 text-white font-light text-sm md:text-base xl:text-lg py-2 px-4 rounded flex flex-row gap-2 items-center justify-center w-1/3 xl:w-1/2" 
+              :class="{ 'opacity-50 cursor-not-allowed': !isFormValid }"
+              :disabled="!isFormValid"
               @click="handleSubmit"
             >
               <BookmarkSquareIcon

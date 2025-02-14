@@ -4,7 +4,7 @@ import { useUserStore } from '../stores/userStore';
 import { onMounted, ref, watch } from 'vue';
 import {  storeToRefs } from 'pinia';
 import { FilterProps } from '@/types/Filter';
-import {debounce} from 'lodash/debounce';
+import debounce from 'lodash/debounce';
 
 const userStore = useUserStore();
 const {users} = storeToRefs(userStore);
