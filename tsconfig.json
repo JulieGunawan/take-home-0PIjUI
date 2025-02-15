@@ -7,7 +7,7 @@
     },
     "strict": true,
     "jsx": "preserve",
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true,
