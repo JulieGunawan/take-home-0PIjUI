@@ -9,5 +9,4 @@ import HomeLayout from './layout/HomeLayout.vue';
 </template>
 
 <style scoped>
-
 </style>
