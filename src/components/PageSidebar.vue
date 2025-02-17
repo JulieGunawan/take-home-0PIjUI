@@ -10,46 +10,46 @@ const userStore = useUserStore();
 const {users} = storeToRefs(userStore);
 
 onMounted(() => {
-    userStore.fetchUsers();
+  userStore.fetchUsers();
 });
 
 const selectUser = (id: string) => {
-    userStore.fetchUserById(id);
+  userStore.fetchUserById(id);
 }
 
 const handleCreateNewUser = () => {
-    userStore.initializeUser();
+  userStore.initializeUser();
 }
 
 const activateFilter = ref<boolean>(false);
 
 const filters = ref<FilterProps>({
-    firstName: '',
-    lastName: '',
-    plan: 'All Plans'
+  firstName: '',
+  lastName: '',
+  plan: 'All Plans'
 });
 
 const handleReset= () => {
-    filters.value = {
-        firstName: '',
-        lastName: '',
-        plan: 'All Plans'
-    }
-    userStore.fetchUsers();
-    activateFilter.value = false;
+  filters.value = {
+    firstName: '',
+    lastName: '',
+    plan: 'All Plans'
+  }
+  userStore.fetchUsers();
+  activateFilter.value = false;
 }
 
 
 const debounceFilter = debounce((filterInput: FilterProps) => {
-    userStore.fetchUsersByFilter(filterInput);  
+  userStore.fetchUsersByFilter(filterInput);  
 },300);
 
 watch(
-    () => filters.value,
-    (newFilters) => {
-        debounceFilter(newFilters);
-    },
-    { deep: true }
+  () => filters.value,
+  (newFilters) => {
+    debounceFilter(newFilters);
+  },
+  { deep: true }
 )
 
 </script>

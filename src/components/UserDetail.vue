@@ -12,12 +12,12 @@ const isCreate = ref<boolean>(false);
 const errors = reactive<FormErrors>({});
 
 const formData = reactive<BasicFormData>({
-    first_name: '',
-    last_name: '',
-    company: '',
-    email: '',
-    plan: '',
-    phone_number: ''
+  first_name: '',
+  last_name: '',
+  company: '',
+  email: '',
+  plan: '',
+  phone_number: ''
 })
 
 // Format inputted phone number
@@ -62,16 +62,16 @@ const validateForm = () => {
   errors.email = !formData.email 
     ? 'Email is required' 
     : !emailRegex.test(formData.email) 
-    ? 'Invalid email format'
-    : '';
+      ? 'Invalid email format'
+      : '';
   
   // Phone number validation
   const formattedPhoneNumber = formData.phone_number.replace(/\D/g, '');
   errors.phone_number = !formData.phone_number 
     ? 'Phone is required' 
     : formattedPhoneNumber.length < 10 
-    ? 'Phone number must be 10 digits'
-    : '';
+      ? 'Phone number must be 10 digits'
+      : '';
 };
   
 const isFormValid = computed(() => {
@@ -80,26 +80,26 @@ const isFormValid = computed(() => {
 
 //watch the selected user from the left hand side list
 watch(() => user.value, (selectedUser) => {
-    if (selectedUser && selectedUser.id!==0) {
-        formData.first_name = selectedUser.first_name;
-        formData.last_name = selectedUser.last_name;
-        formData.company = selectedUser.company;
-        formData.email = selectedUser.email;
-        formData.plan = selectedUser.plan;
-        formData.phone_number = selectedUser.phone_number;
-        loading.value = false;
-        isCreate.value = false;
-    } else {
-      formData.first_name = "";
-        formData.last_name = "";
-        formData.company = "";
-        formData.email = "";
-        formData.plan = "";
-        formData.phone_number = "";
-        loading.value = false;
-        isCreate.value = true;
-    }
-    // validateForm();
+  if (selectedUser && selectedUser.id!==0) {
+    formData.first_name = selectedUser.first_name;
+    formData.last_name = selectedUser.last_name;
+    formData.company = selectedUser.company;
+    formData.email = selectedUser.email;
+    formData.plan = selectedUser.plan;
+    formData.phone_number = selectedUser.phone_number;
+    loading.value = false;
+    isCreate.value = false;
+  } else {
+    formData.first_name = "";
+    formData.last_name = "";
+    formData.company = "";
+    formData.email = "";
+    formData.plan = "";
+    formData.phone_number = "";
+    loading.value = false;
+    isCreate.value = true;
+  }
+  // validateForm();
 }, {immediate: true});
 
 // Watch for changes in form data
@@ -114,14 +114,14 @@ const handleSubmit = async () => {
   if (Object.values(errors).every(error => !error)) {
     // Check if any user was selected or user value was initialized
     if (user.value) { 
-        if (user.value.id) {
-            userStore.updateUser(user.value.id, formData);
-        } 
-        else { 
-            //capture the created User then update the state with created user
-            const createdUser = await userStore.createNewUser(formData);
-            await userStore.fetchUserById(createdUser.id.toString());
-        }
+      if (user.value.id) {
+        userStore.updateUser(user.value.id, formData);
+      } 
+      else { 
+        //capture the created User then update the state with created user
+        const createdUser = await userStore.createNewUser(formData);
+        await userStore.fetchUserById(createdUser.id.toString());
+      }
     } 
   } 
 };
