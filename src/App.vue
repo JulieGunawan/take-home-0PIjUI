@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HomeLayout from './layout/HomeLayout.vue';
+import HomeLayout from '@/layout/HomeLayout.vue';
 
 
 </script>

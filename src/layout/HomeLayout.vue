@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import PageSidebar from '../components/PageSidebar.vue';
-import UserDetail from '../components/UserDetail.vue';
+import PageSidebar from '@/views/PageSidebar.vue';
+import UserDetail from '@/views/UserDetail.vue';
 </script>
 
 <template>

@@ -19,8 +19,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . ",
-    "lint:fix": "eslint . --fix ",
+    "lint": "eslint . --fix ",
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
