@@ -1,4 +1,5 @@
-type User = {
+
+export type User = {
   id: number
   plan: string
   email: string
@@ -8,4 +9,4 @@ type User = {
   phone_number: string
 }
 
-export default User
+

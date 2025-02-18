@@ -39,7 +39,6 @@ const handleReset= () => {
   activateFilter.value = false;
 }
 
-
 const debounceFilter = debounce((filterInput: FilterProps) => {
   userStore.fetchUsersByFilter(filterInput);  
 },300);
