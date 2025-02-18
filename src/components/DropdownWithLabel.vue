@@ -15,9 +15,10 @@ const emit = defineEmits(['update:modelValue']);
 
 // Handle input changes
 const handleInput = (event: Event) => {
-    const target = event.target as HTMLSelectElement;
-    emit('update:modelValue', target.value);
+  const target = event.target as HTMLSelectElement;
+  emit('update:modelValue', target.value);
 };
+
 </script>
 
 <template>

@@ -69,6 +69,7 @@ watch(() => user.value, (selectedUser) => {
         formData.company = selectedUser.company;
         formData.email = selectedUser.email;
         formData.phone_number = selectedUser.phone_number;
+        formData.plan = selectedUser.plan;
         loading.value = false;
         isCreate.value = false;
     } else {
@@ -77,6 +78,7 @@ watch(() => user.value, (selectedUser) => {
         formData.company = "";
         formData.email = "";
         formData.phone_number = "";
+        formData.plan = "";
         loading.value = false;
         isCreate.value = true;
     }
@@ -99,10 +101,14 @@ const handleSubmit = async () => {
             if (user.value.id) {
                 userStore.updateUser(user.value.id, formData);
             } 
+             //this line will be applied when create new user button is clicked
+              else { 
+              const createdUser = await userStore.createNewUser(formData);
+              await userStore.fetchUserById(createdUser.id.toString());
+          }
         } 
-        //the second watch, that watches formData, didn't assign the value back to user.value, thus updating the form will result in user.value to be null 
+        // this logic will be applied the first time the page is rendered with empty form
         else { 
-            //capture the created User then update the state with created user
             const createdUser = await userStore.createNewUser(formData);
             await userStore.fetchUserById(createdUser.id.toString());
         }
